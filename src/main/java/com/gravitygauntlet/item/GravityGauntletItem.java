@@ -4,10 +4,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -34,18 +32,20 @@ public class GravityGauntletItem extends Item {
 				return TypedActionResult.success(player.getStackInHand(hand));
 			}
 			
-			// Иначе - захватить блок
-			BlockHitResult hitResult = raycast(world, player, RaycastContext.FluidHandling.NONE);
+			// Иначе - захватить блок (используем переименованный метод customRaycast)
+			BlockHitResult hitResult = customRaycast(world, player, RaycastContext.FluidHandling.NONE);
 			if (hitResult.getType() == HitResult.Type.BLOCK) {
 				BlockPos pos = hitResult.getBlockPos();
 				BlockState state = world.getBlockState(pos);
 				
-				if (!state.isAir() && !state.isLiquid()) {
+				// Проверяем, что это не воздух и не жидкость
+				if (!state.isAir() && state.getFluidState().isEmpty()) {
 					// Создаем падающий блок
 					FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(serverWorld, pos, state);
 					
 					// Сохраняем UUID владельца в NBT
 					NbtCompound nbt = new NbtCompound();
+					fallingBlock.writeNbt(nbt);
 					nbt.putUuid("GravityOwner", player.getUuid());
 					nbt.putLong("GravityTime", world.getTime());
 					fallingBlock.readNbt(nbt);
@@ -65,7 +65,8 @@ public class GravityGauntletItem extends Item {
 		return TypedActionResult.pass(player.getStackInHand(hand));
 	}
 	
-	private BlockHitResult raycast(World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
+	// ПЕРЕИМЕНОВАНО: Item.raycast является static в ванильном коде, поэтому используем другое имя
+	private BlockHitResult customRaycast(World world, PlayerEntity player, RaycastContext.FluidHandling fluidHandling) {
 		Vec3d start = player.getCameraPosVec(1.0F);
 		Vec3d direction = player.getRotationVec(1.0F);
 		Vec3d end = start.add(direction.multiply(5.0));
