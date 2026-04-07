@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "gravitygauntlet",
+	"version": "${version}",
+	"name": "Gravity Gauntlet",
+	"description": "Capture blocks and make them orbit around you!",
+	"authors": [
+		"GravityDev"
+	],
+	"contact": {
+		"homepage": "https://github.com/yourusername/gravitygauntlet",
+		"sources": "https://github.com/yourusername/gravitygauntlet"
+	},
+	"license": "MIT",
+	"icon": "assets/gravitygauntlet/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.gravitygauntlet.GravityGauntletMod"
+		]
+	},
+	"mixins": [
+		"gravitygauntlet.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.0",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
