@@ -3,16 +3,14 @@ package com.gravitygauntlet.mixin;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,19 +31,17 @@ public abstract class FallingBlockEntityMixin extends Entity {
 		NbtCompound nbt = new NbtCompound();
 		self.writeNbt(nbt);
 		
-		// Проверяем, есть ли владелец
 		if (!nbt.containsUuid("GravityOwner")) return;
 		
 		UUID ownerUuid = nbt.getUuid("GravityOwner");
 		long startTime = nbt.getLong("GravityTime");
 		boolean isShot = nbt.getBoolean("GravityShot");
 		
-		// Если выстрелен - наносим урон при столкновении
 		if (isShot) {
 			List<Entity> entities = this.getWorld().getOtherEntities(this, this.getBoundingBox().expand(0.5));
 			for (Entity entity : entities) {
 				if (entity instanceof PlayerEntity && entity.getUuid().equals(ownerUuid)) {
-					continue; // Не наносим урон владельцу
+					continue;
 				}
 				if (entity instanceof PlayerEntity || entity.getType().getSpawnGroup().isPeaceful()) {
 					entity.damage(this.getDamageSources().fallingBlock(this), 8.0F);
@@ -57,26 +53,22 @@ public abstract class FallingBlockEntityMixin extends Entity {
 			return;
 		}
 		
-		// Ищем владельца
 		PlayerEntity owner = this.getWorld().getPlayerByUuid(ownerUuid);
 		if (owner == null || !owner.isAlive()) {
-			// Владелец не найден - включаем гравитацию
 			self.setNoGravity(false);
 			return;
 		}
 		
-		// Орбита вокруг головы игрока
 		double radius = 3.0;
 		double time = (this.getWorld().getTime() - startTime + this.getId() * 20) * 0.05;
 		
 		double offsetX = Math.cos(time) * radius;
 		double offsetZ = Math.sin(time) * radius;
-		double offsetY = Math.sin(time * 2) * 0.5 + 2.0; // Высота на уровне головы + колебание
+		double offsetY = Math.sin(time * 2) * 0.5 + 2.0;
 		
 		Vec3d targetPos = owner.getPos().add(offsetX, offsetY, offsetZ);
 		Vec3d currentPos = self.getPos();
 		
-		// Плавное движение к целевой позиции
 		Vec3d direction = targetPos.subtract(currentPos).normalize();
 		double distance = currentPos.distanceTo(targetPos);
 		
@@ -88,7 +80,6 @@ public abstract class FallingBlockEntityMixin extends Entity {
 			self.setVelocity(Vec3d.ZERO);
 		}
 		
-		// Сбрасываем время падения, чтобы блок не размещался
 		self.timeFalling = 0;
 	}
 }
