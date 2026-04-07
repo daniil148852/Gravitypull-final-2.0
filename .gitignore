@@ -1,6 +1,39 @@
+# Gradle
 .gradle/
 build/
-/out/
+out/
+classes/
+
+# Eclipse
+*.launch
+.settings/
+.metadata/
+.classpath
+.project
+
+# IntelliJ IDEA
 .idea/
 *.iml
-*.class
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Fabric
+run/
+logs/
+
+# Minecraft
+saves/
+screenshots/
+server-resource-packs/
+texturepacks/
+resourcepacks/
+
+# Other
+*.log
+hs_err_pid*
