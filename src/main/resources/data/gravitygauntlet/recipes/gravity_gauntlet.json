@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"pattern": [
+		"DED",
+		"DND",
+		" D "
+	],
+	"key": {
+		"D": {
+			"item": "minecraft:diamond"
+		},
+		"E": {
+			"item": "minecraft:ender_pearl"
+		},
+		"N": {
+			"item": "minecraft:nether_star"
+		}
+	},
+	"result": {
+		"item": "gravitygauntlet:gravity_gauntlet",
+		"count": 1
+	}
+}
